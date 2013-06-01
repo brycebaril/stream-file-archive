@@ -1,6 +1,6 @@
 {
   "name": "stream-file-archive",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pipe Streams to time-rotated log files",
   "main": "index.js",
   "scripts": {
