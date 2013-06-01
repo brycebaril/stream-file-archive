@@ -1,0 +1,29 @@
+{
+  "name": "stream-file-archive",
+  "version": "1.0.0",
+  "description": "Pipe Streams to time-rotated log files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:brycebaril/stream-file-archive.git"
+  },
+  "keywords": [
+    "log",
+    "logging",
+    "logrotate",
+    "rotation",
+    "stream",
+    "streams",
+    "archive"
+  ],
+  "author": "Bryce B. Baril",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "mkdirp": "~0.3.5",
+    "readable-stream": "~1.0.2"
+  }
+}
