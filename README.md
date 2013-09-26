@@ -1,7 +1,10 @@
 stream-file-archive
 ===================
 
-`npm install stream-file-archive`
+[![NPM](https://nodei.co/npm/stream-file-archive.png)](https://nodei.co/npm/stream-file-archive/)
+
+[![david-dm](https://david-dm.org/brycebaril/stream-file-archive.png)](https://david-dm.org/brycebaril/stream-file-archive/)
+[![david-dm](https://david-dm.org/brycebaril/stream-file-archive/dev-status.png)](https://david-dm.org/brycebaril/stream-file-archive#info=devDependencies/)
 
 Easy log rotation for Node.js
 
