@@ -11,6 +11,7 @@ var path_module = require("path")
 var mkdir = require("mkdirp")
 var util = require("util")
 var zlib = require("zlib")
+var xtend = require("xtend")
 
 var DATE_OPTIONS = [
   {name: "year",     key: /%Y/, get: function(date) { return date.toISOString().substr(0,4)  }},
@@ -25,6 +26,11 @@ var DATE_OPTIONS = [
 ]
 
 var ROOT_PATH_RE = /^\//
+
+var DEFAULTS = {
+  path: "out.log",
+  conpress: false,
+}
 
 // Date
 // %Y 4-digit year
@@ -48,16 +54,18 @@ function FileArchive(config) {
   Transform.call(this)
   this.cwd = process.cwd()
 
+  var options = xtend(DEFAULTS, config)
+
   // TBD should check for bad filenames somewhere
   this.symlink = ""
-  if (config.symlink) {
-    this.symlink = config.symlink
+  if (options.symlink) {
+    this.symlink = options.symlink
     if (!ROOT_PATH_RE.exec(this.symlink)) {
       this.symlink = path_module.join(this.cwd, this.symlink)
     }
   }
-  this.path_config = config.path || "out.log"
-  this.compress = config.compress || false
+  this.path_config = options.path
+  this.compress = options.compress
 
   process.on("SIGHUP", function () {this.renew(true)})
 
@@ -69,6 +77,9 @@ function FileArchive(config) {
     }
   })
 
+  this.path = this.current_name()
+  this.refcount = 0
+
   this.renew(true)
 }
 util.inherits(FileArchive, Transform)
@@ -77,6 +88,13 @@ FileArchive.prototype._transform = function (chunk, encoding, cb) {
   this.renew()
   this.push(chunk)
   cb()
+}
+
+FileArchive.prototype._done = function () {
+  this.refcount--
+  if (this.refcount <= 0) {
+    this.emit("done")
+  }
 }
 
 FileArchive.prototype.renew = function (force) {
@@ -88,8 +106,12 @@ FileArchive.prototype.renew = function (force) {
     var old_stream = this.stream
     mkpath(this.path)
 
+    this.refcount++
     var newstream = fs.createWriteStream(this.path, {flags: "a", encoding: "utf8"})
     this.unpipe(this.stream)
+
+    newstream.once("finish", this._done.bind(this))
+
     this.pipe(newstream)
     this.stream = newstream
 
@@ -99,7 +121,7 @@ FileArchive.prototype.renew = function (force) {
     }
     if (old_stream && this.compress) {
       old_stream.on("close", function () {
-        archive(old_path)
+        self.archive(old_path)
       })
     }
     if (old_stream && old_stream.writable) old_stream.destroySoon()
@@ -114,16 +136,21 @@ function mkpath(path) {
   }
 }
 
-function archive(path) {
+FileArchive.prototype.archive = function (path) {
+  var self = this
   var inp = fs.createReadStream(path)
   var out = fs.createWriteStream(path + ".gz")
   inp.on("end", function () {
     fs.unlink(path)
+    self._done()
   })
   inp.pipe(zlib.createGzip()).pipe(out)
 }
 
 FileArchive.prototype.current_name = function () {
+  if (this.path && this.path_options.length == 0)
+    return this.path
+
   var d = new Date()
   var path = this.path_config
 
@@ -131,6 +158,8 @@ FileArchive.prototype.current_name = function () {
     path = path.replace(option.key, option.get(d))
   })
 
+  // Moving this to initialization would gain some perf, but it would break
+  // the ability to have the first part of the path be a date part to substitute
   if (!ROOT_PATH_RE.exec(path)) {
     path = path_module.join(this.cwd, path)
   }

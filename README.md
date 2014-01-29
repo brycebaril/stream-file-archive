@@ -63,6 +63,11 @@ compress
 
 Boolean value, whether to gzip the files once they aren't being written to.
 
+Events
+---
+
+Emits a `done` event when the source stream has finished and all file stream work is complete.
+
 NOTES:
 ======
 
