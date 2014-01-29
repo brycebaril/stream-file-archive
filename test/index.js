@@ -81,3 +81,10 @@ test("compress", function (t) {
     })
   })
 })
+
+test("cleanup", function (t) {
+  rimraf("/tmp/sfa_tests/", function () {
+    t.ok("cleaned up.")
+    t.end()
+  })
+})
