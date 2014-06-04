@@ -29,7 +29,7 @@ var ROOT_PATH_RE = /^\//
 
 var DEFAULTS = {
   path: "out.log",
-  conpress: false,
+  compress: false,
 }
 
 // Date
