@@ -67,10 +67,10 @@ function FileArchive(config) {
   this.path_config = options.path
   this.compress = options.compress
 
-  process.on("SIGHUP", function () {this.renew(true)})
+  var self = this
+  process.on("SIGHUP", function () {self.renew(true)})
 
   this.path_options = []
-  var self = this
   this.path_options = DATE_OPTIONS.filter(function (option) {
     if (option.key.exec(self.path_config)) {
       return option
@@ -117,7 +117,11 @@ FileArchive.prototype.renew = function (force) {
 
     if (this.symlink) {
       mkpath(this.symlink)
-      fs.unlink(this.symlink, function () { fs.symlink(self.path, self.symlink) })
+      fs.unlink(this.symlink, function () {
+        fs.symlink(self.path, self.symlink, function () {
+          // TODO anything need to be done here?
+        })
+      })
     }
     if (old_stream && this.compress) {
       old_stream.on("close", function () {
