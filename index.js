@@ -25,7 +25,7 @@ var DATE_OPTIONS = [
   {name: "iso",      key: /%I/, get: function(date) { return date.toISOString().substr(0,19) }},
 ]
 var ROOT_PATH_RE = /^\//;//unix root
-if ((/^win/.test(process.platform)) {//is windows
+if (/^win/.test(process.platform)) {//is windows
   ROOT_PATH_RE = /^[a-zA-Z]\:\\/;//win root
 }
 
