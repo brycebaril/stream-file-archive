@@ -25,6 +25,7 @@
   "dependencies": {
     "mkdirp": "~0.5.0",
     "readable-stream": "~1.0.33",
+    "ultra-strftime": "^1.0.2",
     "xtend": "~4.0.0"
   },
   "devDependencies": {

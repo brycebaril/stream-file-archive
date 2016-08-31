@@ -9,21 +9,11 @@ if (!Transform) {
 var fs = require("fs")
 var path_module = require("path")
 var mkdir = require("mkdirp")
+var strftime = require("ultra-strftime")
 var util = require("util")
 var zlib = require("zlib")
 var xtend = require("xtend")
 
-var DATE_OPTIONS = [
-  {name: "year",     key: /%Y/, get: function(date) { return date.toISOString().substr(0,4)  }},
-  {name: "month",    key: /%m/, get: function(date) { return date.toISOString().substr(5,2)  }},
-  {name: "day",      key: /%d/, get: function(date) { return date.toISOString().substr(8,2)  }},
-  {name: "iso_date", key: /%x/, get: function(date) { return date.toISOString().substr(0,10) }},
-  {name: "hour",     key: /%h/, get: function(date) { return date.toISOString().substr(11,2) }},
-  {name: "minute",   key: /%M/, get: function(date) { return date.toISOString().substr(14,2) }},
-  {name: "second",   key: /%S/, get: function(date) { return date.toISOString().substr(17,2) }},
-  {name: "iso_time", key: /%X/, get: function(date) { return date.toISOString().substr(11,8) }},
-  {name: "iso",      key: /%I/, get: function(date) { return date.toISOString().substr(0,19) }},
-]
 var ROOT_PATH_RE = /^\//;//unix root
 if (/^win/.test(process.platform)) {//is windows
   ROOT_PATH_RE = /^[a-zA-Z]\:\\/;//win root
@@ -71,13 +61,6 @@ function FileArchive(config) {
 
   var self = this
   process.on("SIGHUP", function () {self.renew(true)})
-
-  this.path_options = []
-  this.path_options = DATE_OPTIONS.filter(function (option) {
-    if (option.key.exec(self.path_config)) {
-      return option
-    }
-  })
 
   this.path = this.current_name()
   this.refcount = 0
@@ -154,15 +137,11 @@ FileArchive.prototype.archive = function (path) {
 }
 
 FileArchive.prototype.current_name = function () {
-  if (this.path && this.path_options.length == 0)
+  if (this.path && this.path_config.indexOf("%") === -1)
     return this.path
 
   var d = new Date()
-  var path = this.path_config
-
-  this.path_options.forEach(function (option) {
-    path = path.replace(option.key, option.get(d))
-  })
+  var path = strftime(this.path_config, d)
 
   // Moving this to initialization would gain some perf, but it would break
   // the ability to have the first part of the path be a date part to substitute

@@ -41,14 +41,16 @@ A string file path with any of the below options to define rotation schedule:
 e.g. `logs/mylog-%Y-%m-%d.log` would result in logs like `logs/mylog-2013-06-01.log`
 
   * %Y 4-digit year e.g. 2013
+  * %y 2-digit year e.g. 13
   * %m month (01..12)
   * %d day of month (01..31)
-  * %x iso8601 date portion (e.g. 2012-09-24)
-  * %h hour (00..23)
+  * %F iso8601 date portion (e.g. 2012-09-24)
+  * %H hour (00..23)
   * %M minute (00..59)
   * %S second (00..61)
-  * %X iso8601 time portion to the second (e.g.: 15:12:47)
-  * %I iso8601 date/time to the second (e.g. 2012-09-24T15:12:47)
+  * %T iso8601 time portion to the second (e.g.: 15:12:47)
+
+See [strftime](https://www.npmjs.com/package/strftime) documentation for all specifiers.
 
 symlink
 -------
