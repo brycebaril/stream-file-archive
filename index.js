@@ -130,7 +130,7 @@ FileArchive.prototype.archive = function (path) {
   var inp = fs.createReadStream(path)
   var out = fs.createWriteStream(path + ".gz")
   inp.on("end", function () {
-    fs.unlink(path)
+    fs.unlink(path, function(err) {})
     self._done()
   })
   inp.pipe(zlib.createGzip()).pipe(out)
